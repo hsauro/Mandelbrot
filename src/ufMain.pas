@@ -5,20 +5,29 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   System.Types, System.UITypes, Vcl.Graphics, Skia, Skia.Vcl, System.UIConsts,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons, System.Diagnostics;
 
 type
   TfrmMain = class(TForm)
     Panel1: TPanel;
     Panel2: TPanel;
     btnSkia: TButton;
-    btnVCL: TButton;
-    GridPanel1: TGridPanel;
-    Image1: TImage;
-    Image2: TImage;
+    btnVCLPixel: TButton;
     btnClose: TButton;
+    lblSkiaTime: TLabel;
+    lblVCLTime: TLabel;
+    btnVCLScanline: TButton;
+    lblVCLScanLine: TLabel;
+    Image1: TImage;
+    Panel3: TPanel;
+    btnClear: TSpeedButton;
+    Button1: TButton;
+    lblSkiaPixelMap: TLabel;
     procedure btnSkiaClick(Sender: TObject);
-    procedure btnVCLClick(Sender: TObject);
+    procedure btnVCLPixelClick(Sender: TObject);
+    procedure btnVCLScanlineClick(Sender: TObject);
+    procedure btnClearClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -75,6 +84,42 @@ begin
   end;
 end;
 
+procedure DrawMandelbrotSkiaPixmap(APixmap: ISkPixmap; X, Y, au, bu: Double; X2, Y2: Integer);
+  var
+    c1, c2, z1, z2, tmp: Double;
+    i, j, Count, rgb: Integer;
+    hue, saturation, value: Double;
+  begin
+    c2 := bu;
+    for i := 10 to X2 - 1 do
+    begin
+      c1 := au;
+      for j := 0 to Y2 - 1 do
+      begin
+        z1 := 0;
+        z2 := 0;
+        Count := 0;
+        // count is deep of iteration of the mandelbrot set
+        // if |z| >=2 then z is not a member of a mandelset
+        while (((z1 * z1 + z2 * z2 < 4) and (Count <= 50))) do
+        begin
+          tmp := z1;
+          z1 := z1 * z1 - z2 * z2 + c1;
+          z2 := 2 * tmp * z2 + c2;
+          Inc(Count);
+        end;
+        // The color depends on the number of iterations
+        hue := count / 50;
+        saturation := 0.6;
+        value := 0.5;
+
+        PCardinal(APixmap.PixelAddr[i, j])^ := HSLtoRGB(hue, saturation, value);
+        c1 := c1 + X;
+      end;
+      c2 := c2 + Y;
+    end;
+  end;
+
 procedure DrawMandelbrotVCL(ACanvas: TCanvas; X, Y, au, bu: Double; X2, Y2: Integer);
 var
   c1, c2, z1, z2, tmp: Double;
@@ -112,6 +157,57 @@ begin
   end;
 end;
 
+procedure DrawMandelbrotVCLUsingScanLine(bmp: TBitmap; X, Y, au, bu: Double; X2, Y2: Integer);
+var
+  c1, c2, z1, z2, tmp: Double;
+  i, j, Count, rgb: Integer;
+  hue, saturation, value : double;
+  fr, fg, fb : single;
+  ACanvas: TCanvas;
+  p, currPixel: PColor;
+  bytesPerLine: integer;
+begin
+  bmp.PixelFormat := pf32bit;
+  //nb: should probably test here for the occas. non-inverted image
+  p := bmp.ScanLine[0];
+  bytesPerLine := bmp.Width;
+  c2 := bu;
+  for i := 10 to X2 - 1 do
+  begin
+    c1 := au;
+    currPixel := p;
+    inc(currPixel, i);
+    for j := 0 to Y2 - 1 do
+    begin
+      z1 := 0;
+      z2 := 0;
+      Count := 0;
+      // count is deep of iteration of the mandelbrot set
+      // if |z| >=2 then z is not a member of a mandelset
+      while (((z1 * z1 + z2 * z2 < 4) and (Count <= 50))) do
+      begin
+        tmp := z1;
+        z1 := z1 * z1 - z2 * z2 + c1;
+        z2 := 2 * tmp * z2 + c2;
+        Inc(Count);
+      end;
+      // The color depends on the number of iterations
+      hue := count / 50;
+      saturation := 0.6;
+      value := 0.5;
+      currPixel^ := TColor(HSLtoRGB(hue, saturation, value));
+      c1 := c1 + X;
+      dec(currPixel, bytesPerLine);
+    end;
+    c2 := c2 + Y;
+  end;
+end;
+
+
+procedure TfrmMain.btnClearClick(Sender: TObject);
+begin
+  image1.Picture := nil;
+end;
 
 procedure TfrmMain.btnSkiaClick(Sender: TObject);
 var LBitmap : TBitmap;
@@ -120,9 +216,12 @@ var LBitmap : TBitmap;
   au, ao: double;
   dX, dY, bo, bu: Double;
   width, height : integer;
+  LTimer: TStopwatch;
 begin
- width := Image1.width; height := Image1.height;
- LBitmap := TBitmap.Create(width, height);
+  LTimer := TStopwatch.StartNew;
+  width := Image1.width; height := Image1.height;
+  LBitmap := TBitmap.Create(width, height);
+  screen.cursor := crHourGlass;
   try
     LBitmap.SkiaDraw(
       procedure (const ACanvas: ISkCanvas)
@@ -146,34 +245,103 @@ begin
     Image1.Picture.Assign(LBitmap);
   finally
     Lbitmap.free;
+    screen.cursor := crDefault;
   end;
+  lblSkiaTime.Caption := 'Time: ' + LTimer.ElapsedMilliseconds.ToString + ' ms';
 end;
 
 
-procedure TfrmMain.btnVCLClick(Sender: TObject);
+procedure TfrmMain.btnVCLPixelClick(Sender: TObject);
 var au, ao: double;
     dX, dY, bo, bu: Double;
     bitmap : TBitmap;
+    LTimer: TStopwatch;
 begin
-  bitmap := TBitmap.Create (Image2.Width, Image2.Height);
+  LTimer := TStopwatch.StartNew;
+  screen.cursor := crHourGlass;
+  bitmap := TBitmap.Create (Image1.Width, Image1.Height);
   try
-    ao := -0.5766;
-    au := -0.5506;
-    bo := 0.6338;
-    bu := 0.6534;
-
     ao := 1;
     au := -2;
     bo := 1.5;
     bu := -1.5;
     // direct scaling cause of speed
-    dX := (ao - au) / (Image2.width);
-    dY := (bo - bu) / (Image2.Height);
-    DrawMandelbrotVCL(Bitmap.Canvas, dX, dY, au, bu, Image2.width, Image2.height);
-    Image2.Picture.Assign(Bitmap);
+    dX := (ao - au) / (Image1.width);
+    dY := (bo - bu) / (Image1.Height);
+    DrawMandelbrotVCL(Bitmap.Canvas, dX, dY, au, bu, Image1.width, Image1.height);
+    Image1.Picture.Assign(Bitmap);
   finally
     bitmap.Free;
+    screen.cursor := crDefault;
   end;
+  lblVCLTime.Caption := 'Time: ' + LTimer.ElapsedMilliseconds.ToString + ' ms';
+end;
+
+
+procedure TfrmMain.btnVCLScanlineClick(Sender: TObject);
+var au, ao: double;
+    dX, dY, bo, bu: Double;
+    bitmap : TBitmap;
+    LTimer: TStopwatch;
+begin
+  LTimer := TStopwatch.StartNew;
+  screen.cursor := crHourGlass;
+  bitmap := TBitmap.Create (Image1.Width, Image1.Height);
+  try
+    ao := 1;
+    au := -2;
+    bo := 1.5;
+    bu := -1.5;
+    // direct scaling cause of speed
+    dX := (ao - au) / (Image1.width);
+    dY := (bo - bu) / (Image1.Height);
+    DrawMandelbrotVCLUsingScanLine (Bitmap, dX, dY, au, bu, Image1.width, Image1.height);
+    Image1.Picture.Assign(Bitmap);
+  finally
+    bitmap.Free;
+    screen.cursor := crDefault;
+  end;
+  lblVCLScanLine.Caption := 'Time: ' + LTimer.ElapsedMilliseconds.ToString + ' ms';
+end;
+
+procedure TfrmMain.Button1Click(Sender: TObject);
+var
+  au, ao: Double;
+  dX, dY, bo, bu: Double;
+  LWidth: Integer;
+  LHeight: Integer;
+  LTimer: TStopwatch;
+  LBitmap: TBitmap;
+  LSurface: ISkSurface;
+begin
+  LTimer := TStopwatch.StartNew;
+  LWidth := Image1.Width;
+  LHeight := Image1.Height;
+  LSurface := TSkSurface.MakeRaster(LWidth, LHeight);
+  screen.cursor := crHourGlass;
+
+  LBitmap := TBitmap.Create(LWidth, LHeight);
+  try
+    ao := 1;
+    au := -2;
+    bo := 1.5;
+    bu := -1.5;
+    // direct scaling cause of speed
+    dX := (ao - au) / (LWidth);
+    dY := (bo - bu) / (LHeight);
+    DrawMandelbrotSkiaPixmap(LSurface.PeekPixels, dX, dY, au, bu, LWidth, LHeight);
+    LBitmap.SkiaDraw(
+      procedure (const ACanvas: ISkCanvas)
+      begin
+        ACanvas.DrawImage(LSurface.MakeImageSnapshot, 0, 0);
+      end);
+    Image1.Picture.Assign(LBitmap);
+  finally
+    LBitmap.Free;
+    screen.cursor := crDefault;
+  end;
+
+  lblSkiaPixelMap.Caption := 'Time: ' + LTimer.ElapsedMilliseconds.ToString +' ms';
 end;
 
 end.

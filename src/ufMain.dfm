@@ -1,10 +1,9 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Anchors = [akLeft, akTop, akRight]
-  Caption = 'Manelbrot'
-  ClientHeight = 1160
-  ClientWidth = 2001
+  Caption = 'Mandelbrot Timings'
+  ClientHeight = 1009
+  ClientWidth = 1018
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,10 +13,25 @@ object frmMain: TfrmMain
   Position = poScreenCenter
   PixelsPerInch = 144
   TextHeight = 25
+  object Image1: TImage
+    Left = 105
+    Top = 121
+    Width = 913
+    Height = 826
+    Margins.Left = 5
+    Margins.Top = 5
+    Margins.Right = 5
+    Margins.Bottom = 5
+    Align = alClient
+    ExplicitLeft = 376
+    ExplicitTop = 217
+    ExplicitWidth = 158
+    ExplicitHeight = 157
+  end
   object Panel1: TPanel
     Left = 0
-    Top = 1098
-    Width = 2001
+    Top = 947
+    Width = 1018
     Height = 62
     Margins.Left = 5
     Margins.Top = 5
@@ -25,14 +39,13 @@ object frmMain: TfrmMain
     Margins.Bottom = 5
     Align = alBottom
     TabOrder = 0
-    ExplicitLeft = 680
-    ExplicitTop = 1224
-    ExplicitWidth = 277
+    ExplicitTop = 1098
+    ExplicitWidth = 2001
     DesignSize = (
-      2001
+      1018
       62)
     object btnClose: TButton
-      Left = 1858
+      Left = 875
       Top = 12
       Width = 110
       Height = 40
@@ -43,115 +56,141 @@ object frmMain: TfrmMain
       Anchors = [akTop, akRight]
       Caption = 'Close'
       TabOrder = 0
+      ExplicitLeft = 1858
     end
   end
   object Panel2: TPanel
     Left = 0
     Top = 0
-    Width = 2001
-    Height = 61
+    Width = 1018
+    Height = 121
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
     Margins.Bottom = 5
     Align = alTop
     TabOrder = 1
-    ExplicitLeft = -10
-    ExplicitTop = -24
-    ExplicitWidth = 2237
-    object btnSkia: TButton
+    ExplicitWidth = 2001
+    object lblSkiaTime: TLabel
       Left = 48
+      Top = 67
+      Width = 38
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Time'
+    end
+    object lblVCLTime: TLabel
+      Left = 538
+      Top = 67
+      Width = 38
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Time'
+    end
+    object lblVCLScanLine: TLabel
+      Left = 781
+      Top = 67
+      Width = 38
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Time'
+    end
+    object lblSkiaPixelMap: TLabel
+      Left = 293
+      Top = 67
+      Width = 38
+      Height = 25
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Time'
+    end
+    object btnSkia: TButton
+      Left = 28
       Top = 13
-      Width = 193
+      Width = 230
       Height = 38
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
       Margins.Bottom = 5
-      Caption = 'Draw Using Skia'
+      Caption = 'Using Skia DrawPoint'
       TabOrder = 0
       OnClick = btnSkiaClick
     end
-    object btnVCL: TButton
-      Left = 276
+    object btnVCLPixel: TButton
+      Left = 517
       Top = 13
-      Width = 193
+      Width = 230
       Height = 38
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
       Margins.Bottom = 5
-      Caption = 'Draw Using VCL'
+      Caption = 'Using VCL pixel'
       TabOrder = 1
-      OnClick = btnVCLClick
+      OnClick = btnVCLPixelClick
+    end
+    object btnVCLScanline: TButton
+      Left = 761
+      Top = 13
+      Width = 230
+      Height = 38
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Using VCL scanline'
+      TabOrder = 2
+      OnClick = btnVCLScanlineClick
+    end
+    object Button1: TButton
+      Left = 273
+      Top = 13
+      Width = 230
+      Height = 38
+      Margins.Left = 5
+      Margins.Top = 5
+      Margins.Right = 5
+      Margins.Bottom = 5
+      Caption = 'Using Skia pixelmap'
+      TabOrder = 3
+      OnClick = Button1Click
     end
   end
-  object GridPanel1: TGridPanel
+  object Panel3: TPanel
     Left = 0
-    Top = 61
-    Width = 2001
-    Height = 1037
+    Top = 121
+    Width = 105
+    Height = 826
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
     Margins.Bottom = 5
-    Align = alClient
-    ColumnCollection = <
-      item
-        Value = 50.000000000000000000
-      end
-      item
-        Value = 50.000000000000000000
-      end>
-    ControlCollection = <
-      item
-        Column = 0
-        Control = Image1
-        Row = 0
-      end
-      item
-        Column = 1
-        Control = Image2
-        Row = 0
-      end>
-    RowCollection = <
-      item
-        Value = 100.000000000000000000
-      end>
+    Align = alLeft
     TabOrder = 2
-    ExplicitLeft = 904
-    ExplicitTop = 184
-    ExplicitWidth = 457
-    ExplicitHeight = 401
-    object Image1: TImage
-      Left = 1
-      Top = 1
-      Width = 1000
-      Height = 1035
+    ExplicitHeight = 706
+    object btnClear: TSpeedButton
+      Left = 16
+      Top = 28
+      Width = 66
+      Height = 33
       Margins.Left = 5
       Margins.Top = 5
       Margins.Right = 5
       Margins.Bottom = 5
-      Align = alClient
-      ExplicitLeft = 264
-      ExplicitTop = 154
-      ExplicitWidth = 105
-      ExplicitHeight = 105
-    end
-    object Image2: TImage
-      Left = 1001
-      Top = 1
-      Width = 999
-      Height = 1035
-      Margins.Left = 5
-      Margins.Top = 5
-      Margins.Right = 5
-      Margins.Bottom = 5
-      Align = alClient
-      ExplicitLeft = 290
-      ExplicitTop = 148
-      ExplicitWidth = 105
-      ExplicitHeight = 105
+      Caption = 'Clear'
+      OnClick = btnClearClick
     end
   end
 end
