@@ -21,13 +21,13 @@ type
     Image1: TImage;
     Panel3: TPanel;
     btnClear: TSpeedButton;
-    Button1: TButton;
+    btnSkiaPixelmap: TButton;
     lblSkiaPixelMap: TLabel;
     procedure btnSkiaClick(Sender: TObject);
     procedure btnVCLPixelClick(Sender: TObject);
     procedure btnVCLScanlineClick(Sender: TObject);
     procedure btnClearClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnSkiaPixelmapClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -84,6 +84,7 @@ begin
   end;
 end;
 
+// Provided by author of skia4delphi
 procedure DrawMandelbrotSkiaPixmap(APixmap: ISkPixmap; X, Y, au, bu: Double; X2, Y2: Integer);
   var
     c1, c2, z1, z2, tmp: Double;
@@ -157,6 +158,8 @@ begin
   end;
 end;
 
+
+// Provided by Angus Johnson
 procedure DrawMandelbrotVCLUsingScanLine(bmp: TBitmap; X, Y, au, bu: Double; X2, Y2: Integer);
 var
   c1, c2, z1, z2, tmp: Double;
@@ -209,6 +212,7 @@ begin
   image1.Picture := nil;
 end;
 
+
 procedure TfrmMain.btnSkiaClick(Sender: TObject);
 var LBitmap : TBitmap;
     LPaint: ISkPaint;
@@ -228,11 +232,6 @@ begin
       begin
         LPaint := TSkPaint.Create;
         LPaint.StrokeWidth := 1;
-        ao := -0.5766;
-        au := -0.5506;
-        bo := 0.6338;
-        bu := 0.6534;
-
         ao := 1;
         au := -2;
         bo := 1.5;
@@ -278,6 +277,7 @@ begin
 end;
 
 
+// Provided by Angus Johnson
 procedure TfrmMain.btnVCLScanlineClick(Sender: TObject);
 var au, ao: double;
     dX, dY, bo, bu: Double;
@@ -304,7 +304,8 @@ begin
   lblVCLScanLine.Caption := 'Time: ' + LTimer.ElapsedMilliseconds.ToString + ' ms';
 end;
 
-procedure TfrmMain.Button1Click(Sender: TObject);
+// Provided by author of skia4delphi
+procedure TfrmMain.btnSkiaPixelmapClick(Sender: TObject);
 var
   au, ao: Double;
   dX, dY, bo, bu: Double;

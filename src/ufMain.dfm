@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'Mandelbrot Timings'
-  ClientHeight = 1009
-  ClientWidth = 1018
+  ClientHeight = 1048
+  ClientWidth = 1026
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object frmMain: TfrmMain
   object Image1: TImage
     Left = 105
     Top = 121
-    Width = 913
-    Height = 826
+    Width = 921
+    Height = 865
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -30,8 +30,8 @@ object frmMain: TfrmMain
   end
   object Panel1: TPanel
     Left = 0
-    Top = 947
-    Width = 1018
+    Top = 986
+    Width = 1026
     Height = 62
     Margins.Left = 5
     Margins.Top = 5
@@ -42,10 +42,10 @@ object frmMain: TfrmMain
     ExplicitTop = 1098
     ExplicitWidth = 2001
     DesignSize = (
-      1018
+      1026
       62)
     object btnClose: TButton
-      Left = 875
+      Left = 883
       Top = 12
       Width = 110
       Height = 40
@@ -62,7 +62,7 @@ object frmMain: TfrmMain
   object Panel2: TPanel
     Left = 0
     Top = 0
-    Width = 1018
+    Width = 1026
     Height = 121
     Margins.Left = 5
     Margins.Top = 5
@@ -154,7 +154,7 @@ object frmMain: TfrmMain
       TabOrder = 2
       OnClick = btnVCLScanlineClick
     end
-    object Button1: TButton
+    object btnSkiaPixelmap: TButton
       Left = 273
       Top = 13
       Width = 230
@@ -165,21 +165,21 @@ object frmMain: TfrmMain
       Margins.Bottom = 5
       Caption = 'Using Skia pixelmap'
       TabOrder = 3
-      OnClick = Button1Click
+      OnClick = btnSkiaPixelmapClick
     end
   end
   object Panel3: TPanel
     Left = 0
     Top = 121
     Width = 105
-    Height = 826
+    Height = 865
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
     Margins.Bottom = 5
     Align = alLeft
     TabOrder = 2
-    ExplicitHeight = 706
+    ExplicitHeight = 977
     object btnClear: TSpeedButton
       Left = 16
       Top = 28
